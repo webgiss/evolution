@@ -1,0 +1,37 @@
+.itemContent {
+    padding-left: 10px;
+}
+.itemContent::before {
+    content:' ';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+}
+
+.itemContentAlive::before {
+    border: 1px solid blue;
+}
+
+.item-organic::before {
+    background-color: #aaff33;
+}
+.item-herbivore::before {
+    background-color: #aaaa00;
+}
+.item-carnivore::before {
+    background-color: #ff33aa;
+}
+.item-omnivore::before {
+    background-color: #cc33cc;
+}
+
+.popupInfo {
+    font-size:10px;
+    line-height: 1.2em;
+    width: 800px;
+}
+
+.itemLine.highlighted {
+    color: red;
+}
