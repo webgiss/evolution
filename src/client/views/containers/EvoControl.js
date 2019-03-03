@@ -10,6 +10,7 @@ const MapDispatchToProps = (dispatch) => {
     return {
         onReset: () => dispatch(actions.evoActions.reset()),
         onNextGen: () => dispatch(actions.evoActions.nextGeneration()),
+        onAddBioMass: () => dispatch(actions.evoActions.addLivingBioMass()),
     };
 };
 
