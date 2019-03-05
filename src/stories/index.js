@@ -10,6 +10,7 @@ let stories = [
     'EvoControl',
     'MiniMap',
     'MiniPhase',
+    'MiniBar',
 ];
 
 stories.forEach(element => {

@@ -27,6 +27,11 @@ import MiniPhaseCarnivoreOmnivoreMass from '../containers/MiniPhaseCarnivoreOmni
 import KeyboardBinder from '../containers/KeyboardBinder';
 import EvoTitle from '../containers/EvoTitle';
 import MiniFiller from './MiniFiller';
+import MiniBarAge from '../containers/MiniBarAge';
+import MiniBarLivingMass from '../containers/MiniBarLivingMass';
+import MiniBarDeadMass from '../containers/MiniBarDeadMass';
+import MiniBarMutationRate from '../containers/MiniBarMutationRate';
+import MiniBarSpeed from '../containers/MiniBarSpeed';
 
 const MainPage = ({onKeyPress}) =>
     <KeyboardBinder>
@@ -54,6 +59,11 @@ const MainPage = ({onKeyPress}) =>
             <MiniPhaseHerbivoreCarnivoreMass />
             <MiniPhaseHerbivoreOmnivoreMass />
             <MiniPhaseCarnivoreOmnivoreMass />
+            <MiniBarAge />
+            <MiniBarSpeed />
+            <MiniBarLivingMass/>
+            <MiniBarDeadMass />
+            <MiniBarMutationRate />
             <HighlightedDetail />
             {
                 // <ItemList />
