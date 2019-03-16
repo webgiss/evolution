@@ -7,6 +7,10 @@ import { Popup, Segment } from 'semantic-ui-react';
 
 const sizePixel = 100;
 
+const itemColor = '#0000ff';
+const backgroundColor = '#e4e4ff';
+const itemBorderColor = '#ffffff';
+
 const getGraph = (values, step) => {
     let minValue = null;
     let maxValue = null;
@@ -40,42 +44,57 @@ const getGraph = (values, step) => {
     return { minValue, maxValue, maxCount, step, data };
 }
 
-const MiniBarGraph = ({ graph }) => {
-    let { minValue, maxValue, maxCount, step, data } = graph;
-    window.data = data;
-    window.graph = graph;
-    // console.log({graph});
-    if (minValue !== null && maxValue !== null) {
-        let n = 1 + ((maxValue - minValue) / step);
-        let barWidth = sizePixel / n;
-        return <div
-            className='miniBar'
-            style={
-                {
-                    width: sizePixel + 'px',
-                    height: sizePixel + 'px',
-                }
-            }
-        >
-            <svg viewBox={`0 0 ${sizePixel} ${sizePixel}`}>
-                {data.map(
-                    ([value, count]) => {
-                        let height = sizePixel * (count / maxCount);
-                        return <rect
-                            key={value}
-                            strokeWidth='2px'
-                            stroke='white'
-                            fill='blue'
-                            x={((value - minValue) / step) * barWidth}
-                            y={sizePixel - height}
-                            width={barWidth}
-                            height={height}
-                        />;
-                    }
-                )}
-            </svg>
-        </div>;
+class MiniBarCanvas extends React.Component {
+    componentDidMount() {
+        this.updateCanvas();
     }
+    componentDidUpdate() {
+        this.updateCanvas();
+    }
+    updateCanvas() {
+        let { graph } = this.props;
+        const canvas = this.refs.canvas;
+        const context = canvas.getContext('2d');
+        let { minValue, maxValue, maxCount, step, data } = graph;
+
+        if (canvas.width !== sizePixel) {
+            canvas.width = sizePixel;
+        }
+        if (canvas.height !== sizePixel) {
+            canvas.height = sizePixel;
+        }
+        context.fillStyle = backgroundColor;
+        context.fillRect(0, 0, sizePixel, sizePixel);
+
+        if (minValue !== null && maxValue !== null) {
+            let n = 1 + ((maxValue - minValue) / step);
+            let barWidth = sizePixel / n;
+            data.forEach(
+                ([value, count]) => {
+                    let width=barWidth;
+                    let height = sizePixel * (count / maxCount);
+                    let x=((value - minValue) / step) * barWidth;
+                    let y=sizePixel - height;
+                    if (height>1) {
+                        context.fillStyle = itemBorderColor;
+                        context.fillRect(x, y, width, height);
+                        if (height>2) {
+                            context.fillStyle = itemColor;
+                            context.fillRect(x+1, y+1, width-2, height-2);
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    render() {
+        return <canvas ref='canvas'></canvas>;
+    }
+
+};
+
+const MiniBarGraph = ({ graph }) => {
     return <div
         className='miniBar'
         style={
@@ -84,9 +103,8 @@ const MiniBarGraph = ({ graph }) => {
                 height: sizePixel + 'px',
             }
         }
-    ></div>;
-};
-
+    ><MiniBarCanvas graph={graph} /></div>;
+}
 
 const MiniBar = ({ values, step, popupTitle, popupContent }) => {
     let graph = getGraph(values, step);

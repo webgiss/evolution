@@ -26,7 +26,7 @@ const MapCell = ({ cellid, isHighlighted, onHighlight, value }) => {
 
 const getid = (cell) => cell && cell.id;
 
-const MiniMapTable = ({ map, size, highlighted, onHighlight, extractValue,popupContent }) =>
+const MiniMapPopupContent = ({ map, size, highlighted, onHighlight, extractValue,popupContent }) =>
     <table className='minimap'>
         <tbody>
             {
@@ -58,7 +58,7 @@ const MiniMapTable = ({ map, size, highlighted, onHighlight, extractValue,popupC
 
 const MiniMap = ({ map, size, highlighted, onHighlight, extractValue, popupTitle, popupContent }) =>
     <Popup
-        trigger={MiniMapTable({ map, size, highlighted, onHighlight, extractValue,popupContent })}
+        trigger={MiniMapPopupContent({ map, size, highlighted, onHighlight, extractValue,popupContent })}
         content={popupContent}
         header={popupTitle}
         position='bottom left'

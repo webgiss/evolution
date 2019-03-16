@@ -1,5 +1,5 @@
 import actions from "../../actions";
-import MiniMap from "../components/MiniMap";
+import MiniMap from "../components/MiniMapCanvas";
 import hot from './utils/hot';
 
 export default (mod, extractValue, getConst, description) => {

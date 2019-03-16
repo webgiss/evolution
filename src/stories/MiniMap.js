@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import MiniMap from '../client/views/components/MiniMap';
+import MiniMap from '../client/views/components/MiniMapCanvas';
 import { action } from '@storybook/addon-actions';
 import { getReduxMockDecorator } from './utils/reduxMock';
 // import '../client/views/main.css';

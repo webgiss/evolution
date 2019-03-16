@@ -1,5 +1,5 @@
 import hot from './utils/hot';
-import MiniBar from "../components/MiniBar";
+import MiniBar from "../components/MiniBarCanvas";
 
 export default (mod, extractValues, description, step) => {
     const MapStateToProps = (state) => {

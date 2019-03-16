@@ -1,5 +1,5 @@
 import hot from './utils/hot';
-import MiniPhase from "../components/MiniPhase";
+import MiniPhase from "../components/MiniPhaseCanvas";
 
 export default (mod, extractValues, description) => {
     const MapStateToProps = (state) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import MiniPhase from '../client/views/components/MiniPhase';
+import MiniPhase from '../client/views/components/MiniPhaseCanvas';
 import { action } from '@storybook/addon-actions';
 import { getReduxMockDecorator } from './utils/reduxMock';
 // import '../client/views/main.css';

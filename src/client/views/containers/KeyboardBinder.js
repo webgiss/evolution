@@ -6,6 +6,7 @@ class KeyboardBinder extends React.Component {
     constructor(props) {
         super(props);
         this._onKey = (e) => this.onKey(e);
+        this._interval = null;
     }
     componentWillMount() {
         document.body.addEventListener('keydown', this._onKey);
@@ -16,18 +17,38 @@ class KeyboardBinder extends React.Component {
     onKey(e) {
         switch (e.code) {
             case 'NumpadAdd':
+            case 'KeyN':
                 {
                     this.props.onNextGen();
                     return true;
                 }
             case 'NumpadMultiply':
+            case 'KeyR':
                 {
                     this.props.onReset();
                     return true;
                 }
             case 'NumpadDivide':
+            case 'KeyM':
                 {
                     this.props.onAddLivingBioMass();
+                    return true;
+                }
+            case 'KeyI':
+                {
+                    if (this._interval) {
+                        clearInterval(this._interval);
+                        this._interval = null;
+                    }
+                    this._interval = setInterval(() => this.props.onNextGen(), 200);
+                    return true;
+                }
+            case 'KeyU':
+                {
+                    if (this._interval) {
+                        clearInterval(this._interval);
+                        this._interval = null;
+                    }
                     return true;
                 }
         }
