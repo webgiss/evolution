@@ -1,4 +1,4 @@
-import { ORGANIC, OMNIVORE, CARNIVORE, HERBIVORE } from "../../constants/itemprops";
+import { ORGANIC, OMNIVORE, CARNIVORE, HERBIVORE, ROCK } from "../../constants/itemprops";
 import random from "./random";
 
 const dnaMeanning = [
@@ -66,7 +66,7 @@ export const extractProps = (item) => {
 };
 
 export const generateDna = (props) => {
-    let alive = props.alive === undefined ? props.type !== ORGANIC : props.alive;
+    let alive = props.alive === undefined ? (props.type !== ORGANIC && props.type !== ROCK) : props.alive;
     if (alive) {
         return dnaMeanning
             .map(dnaGene => (

@@ -2,16 +2,19 @@ import guid from './guid';
 import random from './random';
 import { extractProps, generateDna, mutate } from './itemprops';
 
-import { ORGANIC, HERBIVORE, CARNIVORE, OMNIVORE } from '../../constants/itemprops';
+import { ORGANIC, HERBIVORE, CARNIVORE, OMNIVORE, ROCK } from '../../constants/itemprops';
 
 const normalizeValueOnSize = (value, size) => ((value || 0) + size) % size;
 export const normalizeItem = (item, size) => {
     let id = item.id || guid();
     let x = normalizeValueOnSize(item.x, size);
     let y = normalizeValueOnSize(item.y, size);
+    if (item.type === ROCK) {
+        return { ...item, type: ROCK, id, x, y, alive: false, mass: 0};
+    }
     let props = extractProps(item);
     let dna = generateDna(props);
-    let alive = props.type !== ORGANIC;
+    let alive = (props.type !== ORGANIC && props.type !== ROCK);
     let mass = item.mass || 0;
     let type = props.type || item.type || 0;
     let dnaValues = props;
@@ -27,9 +30,15 @@ export const resolveItems = (item1, item2) => {
     let type2 = item2.type;
     if (! item1.alive) {
         type1 = 0;
+        if (item1.type === ROCK) {
+            type1 = 4;
+        }
     }
     if (! item2.alive) {
         type2 = 0;
+        if (item2.type === ROCK) {
+            type2 = 4;
+        }
     }
 
     let mass = item1.mass + item2.mass;

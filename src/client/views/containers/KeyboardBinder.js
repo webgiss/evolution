@@ -34,6 +34,11 @@ class KeyboardBinder extends React.Component {
                     this.props.onAddLivingBioMass();
                     return true;
                 }
+            case 'KeyZ':
+                {
+                    this.props.onSwapWalls();
+                    return true;
+                }
             case 'KeyI':
                 {
                     if (this._interval) {
@@ -68,6 +73,7 @@ const MapDispatchToProps = (dispatch) => {
         onReset: () => dispatch(actions.evoActions.reset()),
         onNextGen: () => dispatch(actions.evoActions.nextGeneration()),
         onAddLivingBioMass: () => dispatch(actions.evoActions.addLivingBioMass()),
+        onSwapWalls: () => dispatch(actions.evoActions.swapWalls()),
     };
 };
 

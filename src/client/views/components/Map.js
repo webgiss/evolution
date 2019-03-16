@@ -2,7 +2,7 @@ import React from 'react';
 
 import hot from './utils/hot';
 import classNames from 'classnames';
-import { ORGANIC, HERBIVORE, CARNIVORE, OMNIVORE } from '../../constants/itemprops';
+import { ORGANIC, HERBIVORE, CARNIVORE, OMNIVORE, ROCK } from '../../constants/itemprops';
 import './Map.css'
 import { Popup } from 'semantic-ui-react';
 
@@ -17,6 +17,7 @@ const MapCellContent = ({ cell, highlighted, onHighlight }) =>
                     'cell-herbivore': (cell && cell.type === HERBIVORE),
                     'cell-carnivore': (cell && cell.type === CARNIVORE),
                     'cell-omnivore': (cell && cell.type === OMNIVORE),
+                    'cell-rock': (cell && cell.type === ROCK),
                     'alive': (cell && cell.alive),
                     'highlighted':(cell && highlighted === cell.id),
                 }

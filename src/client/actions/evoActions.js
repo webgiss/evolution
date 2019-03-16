@@ -1,11 +1,11 @@
-import { INSERT_ITEM, UPGRADE_TICK, HIGHLIGHT_ITEM } from "../constants/evoMap";
+import { INSERT_ITEM, UPGRADE_TICK, HIGHLIGHT_ITEM, SWAP_WALLS } from "../constants/evoMap";
 import { } from "babel-polyfill";
+import { ROCK } from "../constants/itemprops";
 
 
 export const addLivingBioMass = () => ({ type: INSERT_ITEM, item: { x: 0, y: 0, mass: 70, alive: true, type: 1, dna: '' } });
 export const nextGeneration = () => ({ type: UPGRADE_TICK });
 export const reset = () => async (dispatch) => {
-    console.log('reset');
     dispatch({ type: "RESET" });
     try {
         const initSet = [
@@ -31,4 +31,12 @@ export const reset = () => async (dispatch) => {
     } catch (err) {
     }
 };
+export const swapWalls = () => async (dispatch) => {
+    const range = (n) => [...Array(n).keys()];
+    range(20).forEach((y) => dispatch({ type: SWAP_WALLS, wall: { x: 10, y, type: ROCK } }));
+    range(20).forEach((y) => dispatch({ type: SWAP_WALLS, wall: { x: 11, y, type: ROCK } }));
+    range(20).forEach((y) => dispatch({ type: SWAP_WALLS, wall: { x: 16, y:y+12, type: ROCK } }));
+    range(20).forEach((y) => dispatch({ type: SWAP_WALLS, wall: { x: 17, y:y+12, type: ROCK } }));
+}
+
 export const highlight = (id) => ({ type: HIGHLIGHT_ITEM, id });

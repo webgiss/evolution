@@ -1,4 +1,4 @@
-import { UPGRADE_TICK, INSERT_ITEM, HIGHLIGHT_ITEM } from "../constants/evoMap";
+import { UPGRADE_TICK, INSERT_ITEM, HIGHLIGHT_ITEM, SWAP_WALLS } from "../constants/evoMap";
 import { initMap, insertItem, moveItems } from './utils/items';
 
 const initialState = {
@@ -11,7 +11,7 @@ const initialState = {
 };
 
 const identifyItem = (item) => [
-    item.type === 0 || !(item.alive), 
+    item.type === 0 || !(item.alive),
     item.type === 1 && item.alive,
     item.type === 2 && item.alive,
     item.type === 3 && item.alive,
@@ -23,15 +23,15 @@ const getHistoryFrame = (items) => {
             (acc, item) => {
                 const itemValues = identifyItem(item);
                 return {
-                    count: [0,1,2,3].map(
+                    count: [0, 1, 2, 3].map(
                         k => acc.count[k] + (itemValues[k] ? 1 : 0)
                     ),
-                    mass: [0,1,2,3].map(
+                    mass: [0, 1, 2, 3].map(
                         k => acc.mass[k] + (itemValues[k] ? item.mass : 0)
                     ),
                 };
             },
-            {count:[0,0,0,0], mass:[0,0,0,0]}
+            { count: [0, 0, 0, 0], mass: [0, 0, 0, 0] }
         );
 }
 
@@ -49,13 +49,13 @@ export default (state, action) => {
                 let { size, map, items, generation, history } = state;
                 if (history.length === 0) {
                     history = [
-                        ...history, 
+                        ...history,
                         getHistoryFrame(items)
                     ];
                 }
                 let data = moveItems(size, map, items);
                 history = [
-                    ...history, 
+                    ...history,
                     getHistoryFrame(data.items)
                 ];
 
@@ -66,6 +66,12 @@ export default (state, action) => {
             {
                 let { map, items } = insertItem(state.size, state.map, state.items, action.item);
                 state = { ...state, map, items }
+                break;
+            }
+        case SWAP_WALLS:
+            {
+                let { map, items } = insertItem(state.size, state.map, state.items, action.wall);
+                state = { ...state, map, items };
                 break;
             }
         case HIGHLIGHT_ITEM:
