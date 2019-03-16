@@ -14,6 +14,9 @@ export default (app, config) => {
     app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
     app.use(webpackHotMiddleware(compiler));
 
+    console.log('x',path.join(__dirname, '..', '..', '..', 'dist'))
+    app.use(express.static(path.join(__dirname, '..', '..', '..', 'dist')));
+
     // Include server routes as a middleware
     app.use((req, res, next) => require('../router').default(req, res, next));
 
@@ -55,6 +58,4 @@ export default (app, config) => {
     // Do "hot-reloading" of react stuff on the server
     // Throw away the cached client modules and let them be re-required next time
     compiler.plugin('done', () => clearRequireCacheForPath('client'));
-
-    app.use(express.static(path.join(__dirname, '..', '..', '..', 'dist')));
 }

@@ -6,7 +6,7 @@ import express from 'express';
 export default (app, config) => {
     app.use(router);
 
-    const files = [['','index.html']];
+    const files = [['','index.html','favicon.ico']];
     const distDir = path.join(__dirname, '..', '..', '..', 'dist');
 
     const getServeFile = (filename) => function (req, res, next) {
