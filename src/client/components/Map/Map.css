@@ -1,0 +1,47 @@
+.map {
+    border: 1px solid black;
+    float: left;
+    width: 579px;
+    height: 579px;
+}
+
+.mapCell {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #eeffcc;
+    opacity: 0.5;
+    box-sizing: content-box
+}
+.mapCell.alive {
+    border: 1px solid blue;
+    opacity: 1;
+}
+
+.mapCell.highlighted {
+    color: aquamarine;
+    border: 1px solid aquamarine;
+    font-weight: bold;
+}
+
+.cell-empty {
+    background-color: #eeffcc;
+}
+.cell-organic {
+    background-color: #aaff33;
+}
+.cell-herbivore {
+    background-color: #aaaa00;
+}
+.cell-carnivore {
+    background-color: #ff33aa;
+}
+.cell-omnivore {
+    background-color: #cc33cc;
+}
+.cell-rock {
+    background-color: #442233;
+}
+

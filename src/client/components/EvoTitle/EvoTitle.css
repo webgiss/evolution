@@ -1,0 +1,35 @@
+.count-prefix, .mass-prefix {
+    width: 80px;
+    display: inline-block;
+}
+
+.ui.label.count-organic,
+.ui.label.mass-organic {
+    background-color: #aaff33;
+}
+
+.ui.label.count-herbivore,
+.ui.label.mass-herbivore {
+    background-color: #aaaa00;
+}
+
+.ui.label.count-carnivore,
+.ui.label.mass-carnivore {
+    background-color: #ff33aa;
+}
+
+.ui.label.count-omnivore,
+.ui.label.mass-omnivore {
+    background-color: #cc33cc;
+}
+
+.p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    unicode-bidi: isolate;
+    margin: 0 0 1em;
+    line-height: 1.4285em;
+}

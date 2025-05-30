@@ -1,0 +1,19 @@
+import { createSlice } from "@/redux/tools/createSlice";
+
+const slice = createSlice({
+    name: "{{camelCase name}}",
+    initialState: {
+
+    },
+    reducers: {
+        basicAction(state, action) {
+            console.log("Basic action called with payload:", action.payload);
+        },
+    },
+})
+
+export const {
+    basicAction,
+} = slice.actions;
+
+export default slice
