@@ -1,0 +1,21 @@
+import { fn } from '@storybook/test';
+import { withReduxState } from '@/tools/components/storybook/withReduxDecorator'
+
+import {{pascalCase name}} from './index';
+
+export default {
+    title: 'App/{{pascalCase name}}',
+    component: {{pascalCase name}},
+    tags: ['autodocs'],
+    parameters: {
+    },
+};
+
+export const Default = {
+    decorators: [withReduxState({
+        {{camelCase sliceName}}: {
+        },
+    })],
+    args: {
+    },
+}

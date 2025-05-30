@@ -1,6 +1,14 @@
 data/
 dist/
 node_modules/
+html/
+
 src/server/config/*
 storybook-static
 package-lock.json
+
+.local
+.vscode/settings.json
+debug.log
+yarn-error.log
+*storybook.log

@@ -1,1 +1,3 @@
-import './client/index';
+import init from './client/reactredux'
+
+init()

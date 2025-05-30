@@ -1,0 +1,40 @@
+name: publish
+on:
+  push:
+    branches: [master]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Use yarn
+        run: yarn
+
+      - name: Build with yarn
+        run: yarn build --mode ghp
+
+      # - name: Run tests with yarn
+      #   run: yarn test --run
+
+      - name: Create dist
+        if: success()
+        run: |
+            cp res/*.png res/*.ico dist/
+            touch dist/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: gh-pages
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
