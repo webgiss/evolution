@@ -73,7 +73,7 @@ export function init_debug(store, actions, slices) {
     debug: () => debug()
   });
 
-  // debug()
+  debug()
 }
 
 export const debug_reducer = {

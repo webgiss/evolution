@@ -3,7 +3,7 @@ import createComponent from '@/tools/components/createComponent';
 import './Map.css'
 import { Popup } from 'semantic-ui-react';
 import classNames from 'classnames';
-import { useHighlighted, useMap, useSize } from '@/redux/selectors/evoMap';
+import { useHighlighted, useItems, useMap, useSize } from '@/redux/selectors/evoMap';
 import { useDispatch } from 'react-redux'
 import { actions } from '@/redux/slices'
 import { CARNIVORE, HERBIVORE, OMNIVORE, ORGANIC, ROCK } from '@/utils/constants/itemType';
@@ -52,7 +52,8 @@ const MapCell = createComponent(({ cell, x, y, size, highlighted, onHighlight })
 export default createComponent(() => {
     const dispatch = useDispatch()
 
-    const map = useMap()
+    const items = useItems()
+    const map = (useMap() || []).map((id) => items[id] || null)
     const size = useSize()
     const highlighted = useHighlighted()
     const onHighlight = (id) => dispatch(actions.evoMap.highlightItem({ id }))

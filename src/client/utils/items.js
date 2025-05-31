@@ -5,13 +5,13 @@ import { extractProps, generateDna, mutate } from './itemprops';
 import { ORGANIC, HERBIVORE, CARNIVORE, OMNIVORE, ROCK } from '@/utils/constants/itemType';
 
 const normalizeValueOnSize = (value, size) => ((value || 0) + size) % size;
-export const normalizeItem = (item, size) => {
+export const normalizeNewItem = (item, size) => {
     // console.log('normalizeItem', {item, size});
     let id = item.id || guid();
     let x = normalizeValueOnSize(item.x, size);
     let y = normalizeValueOnSize(item.y, size);
     if (item.type === ROCK) {
-        return { ...item, type: ROCK, id, x, y, alive: false, mass: 0};
+        return { ...item, type: ROCK, id, x, y, alive: false, mass: 0 };
     }
     let props = extractProps(item);
     let dna = generateDna(props);
@@ -20,119 +20,145 @@ export const normalizeItem = (item, size) => {
     let type = props.type || item.type || 0;
     let dnaValues = props;
     if (type == OMNIVORE) {
-       type = HERBIVORE;
+        type = HERBIVORE;
     }
     item = { ...item, type, id, x, y, alive, mass, dna, dnaValues };
     return item;
 };
 
+export const normalizeItem = (item, size) => {
+    if (!item.id) {
+        item.id = guid();
+    }
+    item.x = normalizeValueOnSize(item.x, size);
+    item.y = normalizeValueOnSize(item.y, size);
+    const props = extractProps(item);
+    item.dna = generateDna(props);
+    item.alive = (props.type !== ORGANIC && props.type !== ROCK);
+    item.mass = item.mass || 0;
+    item.type = props.type || item.type || 0;
+    item.dnaValues = props;
+    if (item.type == OMNIVORE) {
+        item.type = HERBIVORE;
+    }
+}
+
 export const resolveItems = (item1, item2) => {
     // console.log('resolveItems', {item1, item2});
+
+    if (!item1) {
+        return item2
+    }
+    if (!item2) {
+        return item1
+    }
+
     let type1 = item1.type;
     let type2 = item2.type;
-    if (! item1.alive) {
-        type1 = 0;
-        if (item1.type === ROCK) {
-            type1 = 4;
-        }
+
+    if ((!item1.alive) && (item1.type !== ROCK)) {
+        type1 = ORGANIC;
     }
-    if (! item2.alive) {
-        type2 = 0;
-        if (item2.type === ROCK) {
-            type2 = 4;
-        }
+    if ((!item2.alive) && (item2.type !== ROCK)) {
+        type2 = ORGANIC;
     }
 
     let mass = item1.mass + item2.mass;
+    let item = null;
 
     switch (type1) {
         case ORGANIC:
             {
                 switch (type2) {
-                    case ORGANIC: return { ...item1, mass };
-                    case HERBIVORE: return { ...item2, mass };
-                    case CARNIVORE: return null;
-                    case OMNIVORE: return { ...item2, mass };
+                    case ORGANIC: item = item1; break;
+                    case HERBIVORE: item = item2; break;
+                    case CARNIVORE: break;
+                    case OMNIVORE: item = item2; break;
+                    case ROCK: break;
                 }
                 break;
             }
         case HERBIVORE:
             {
                 switch (type2) {
-                    case ORGANIC: return { ...item1, mass };
-                    case HERBIVORE: return null;
-                    case CARNIVORE: return { ...item2, mass };
-                    case OMNIVORE: return { ...item2, mass };
+                    case ORGANIC: item = item1; break;
+                    case HERBIVORE: break;
+                    case CARNIVORE: item = item2; break;
+                    case OMNIVORE: item = item2; break;
+                    case ROCK: break;
                 }
                 break;
             }
         case CARNIVORE:
             {
                 switch (type2) {
-                    case ORGANIC: return null;
-                    case HERBIVORE: return { ...item1, mass };
-                    case CARNIVORE: return item1.mass === item2.mass ? null : (item1.mass > item2.mass ? { ...item1, mass } : { ...item2, mass });
-                    case OMNIVORE: return item1.mass === item2.mass ? null : (item1.mass > item2.mass ? { ...item1, mass } : { ...item2, mass });
+                    case ORGANIC: break;
+                    case HERBIVORE: item = item1; break;
+                    case CARNIVORE: item = item1.mass === item2.mass ? null : (item1.mass > item2.mass ? item1 : item2); break;
+                    case OMNIVORE: item = item1.mass === item2.mass ? null : (item1.mass > item2.mass ? item1 : item2); break;
+                    case ROCK: break;
                 }
                 break;
             }
         case OMNIVORE:
             {
                 switch (type2) {
-                    case ORGANIC: return { ...item1, mass };
-                    case HERBIVORE: return { ...item1, mass };
-                    case CARNIVORE: return item1.mass === item2.mass ? null : (item1.mass > item2.mass ? { ...item1, mass } : { ...item2, mass });
-                    case OMNIVORE: return item1.mass === item2.mass ? null : (item1.mass > item2.mass ? { ...item1, mass } : { ...item2, mass });
+                    case ORGANIC: item = item1; break;
+                    case HERBIVORE: item = item1; break;
+                    case CARNIVORE: item = item1.mass === item2.mass ? null : (item1.mass > item2.mass ? item1 : item2); break;
+                    case OMNIVORE: item = item1.mass === item2.mass ? null : (item1.mass > item2.mass ? item1 : item2); break;
+                    case ROCK: break;
                 }
                 break;
             }
+        case ROCK:
+            break;
+        default:
+            console.warn('Unknown item type', { item1, item2 });
+            break;
     }
-    return null;
+    if (item) {
+        item.mass = mass;
+    }
+    return item
 };
 
-const createIdMap = items => items.reduce((acc, elem) => {
-    acc[elem.id] = elem;
-    return acc;
-}, {});
-
-const createIdSet = items => new Set(items.map(item => item.id));
-
-export const updateItems = (items, removed, added) => {
-    // console.log('updateItems', {items, removed, added});
-    let removedSet = createIdSet(removed);
-    let addedMap = createIdMap(added);
-    let itemsSet = createIdSet(items);
-
-    return [...items, ...added.filter(item => !itemsSet.has(item.id))]
-        .filter(item => !(removedSet.has(item.id) && addedMap[item.id] === undefined))
-        .map(item => addedMap[item.id] === undefined ? item : addedMap[item.id])
-        ;
-}
-
-export const initMap = (size, oldItems = []) => {
+export const initMap = (size, oldItems = {}) => {
     // console.log('initMap', {size, oldItems});
     let map = [...Array(size * size).keys()].map(x => null);
-    let items = [];
-    oldItems.forEach(item => {
-        let { x, y } = item;
+    let items = {};
+    Object.values(oldItems).forEach((item) => {
+        let { x, y, id } = item;
         x = normalizeValueOnSize(x, size);
         y = normalizeValueOnSize(y, size);
         let existingItem = map[x + y * size];
         if (!existingItem) {
-            map[x + y * size] = item;
-            items.push(item);
+            map[x + y * size] = id;
+            items[id] = item;
         }
     });
     return { items, map };
 }
 
 const findNewPosition = (speed, x, y, size) => {
-    // console.log('findNewPosition', {speed, x, y, size});
+    // console.log('findNewPosition', { speed, x, y, size });
     let speedx = random(speed + 1);
     let speedy = speed - speedx;
     speedx = (random(2) * 2 - 1) * speedx;
     speedy = (random(2) * 2 - 1) * speedy;
-    return { newX: normalizeValueOnSize(x + speedx, size), newY: normalizeValueOnSize(y + speedy, size) };
+    const result = { newX: normalizeValueOnSize(x + speedx, size), newY: normalizeValueOnSize(y + speedy, size) };
+    // console.log('/findNewPosition', { result });
+    return result;
+}
+
+const addItemToMap = (map, size, items, item) => {
+    const { x, y } = item;
+    const index = x + y * size;
+    if (map[index] !== null) {
+        console.warn('addItemToMap: Position already occupied', { item, map, size, items });
+    }
+    map[index] = item.id;
+    items[item.id] = item;
 }
 
 export const moveItem = (size, map, items, item) => {
@@ -140,91 +166,84 @@ export const moveItem = (size, map, items, item) => {
     if (item.alive) {
         let dnaValues = item.dnaValues;
         let { speed, minAge, maxDeltaAge } = dnaValues;
-        let { x, y, mass, dna } = item;
+        const { x, y, mass } = item;
+        const { id } = item;
         let maxAge = minAge + maxDeltaAge;
         let currentItemId = item.id;
 
         // Age
-        map = [...map];
-        {
-            let newItem = { ...item, age: (item.age || 0) + 1 };
-            items = updateItems(items, [item], [newItem]);
-            item = newItem;
-        }
+        item.age = (item.age || 0) + 1;
 
         // Resolve move
         let retry = 3;
-        let moved = false;
-        while (!moved && retry > 0) {
+        let movedItem = null
+        while (!movedItem && retry > 0) {
             let { newX, newY } = findNewPosition(random(speed - 1) + 1, x, y, size);
             if (newX !== x || newY !== y) {
-                let targetItem = map[newX + newY * size];
-                if (targetItem) {
-                    if (targetItem.id !== item.id) {
-                        let newItem = resolveItems({ ...item, x: newX, y: newY }, targetItem, dnaValues);
-                        if (newItem !== null) {
-                            items = updateItems(items, [item, targetItem], [newItem]);
+                let targetItemId = map[newX + newY * size];
+                if (targetItemId && items[targetItemId]) {
+                    const targetItem = items[targetItemId]
+                    const targetItemMass = targetItem.mass || 0;
+                    if (targetItemId !== id) {
+                        movedItem = resolveItems(item, targetItem);
+                        if (movedItem !== null) {
+                            movedItem.x = newX;
+                            movedItem.y = newY;
                             map[x + y * size] = null;
-                            map[newX + newY * size] = newItem;
-                            item = newItem;
-                            moved = true;
+                            map[newX + newY * size] = movedItem.id;
+                            if (movedItem.id !== targetItemId) {
+                                if (targetItem.alive) {
+                                    targetItem.alive = false;
+                                }
+                                delete items[targetItemId]
+                            }
+                            if (movedItem.id !== id) {
+                                if (item.alive) {
+                                    item.alive = false;
+                                }
+                                delete items[id]
+                            }
+                            // console.log(`Item ${id} moved from (${x}, ${y}) [${mass}] to (${newX}, ${newY}) and merged with item ${targetItemId} [${targetItemMass}] (Winner:${movedItem.id} [${movedItem.mass}])`);
                         }
                     }
                 } else {
-                    let newItem = { ...item, x: newX, y: newY };
-                    items = updateItems(items, [item], [newItem]);
+                    // console.log(`Item ${id} moved from (${x}, ${y}) [${mass}] to (${newX}, ${newY})`);
+                    item.x = newX
+                    item.y = newY
                     map[x + y * size] = null;
-                    map[newX + newY * size] = newItem;
-                    item = newItem;
-                    moved = true;
+                    map[newX + newY * size] = id;
+                    movedItem = item
                 }
             }
             retry -= 1;
         }
 
-        if (moved) {
-            if (currentItemId === item.id) {
-                if (random(dnaValues.dejecRateDen) < dnaValues.dejecRate && item.mass > dnaValues.minDejecMass) {
-                    let dejec = normalizeItem({ x, y, mass: 1, alive: false, dna: '', parent: item.id }, size);
-                    let newItem = { ...item, mass: item.mass - 1 };
-                    items = updateItems(items, [item], [newItem, dejec]);
-                    map[x + y * size] = dejec;
-                    item = newItem;
-                    x = item.x;
-                    y = item.y;
-                    mass = item.mass;
-                    map[x + y * size] = item;
-                } else {
-                    x = item.x;
-                    y = item.y;
-                    mass = item.mass;
+        if (movedItem) {
+            if (movedItem.id === id) {
+                if ((random(dnaValues.dejecRateDen) < dnaValues.dejecRate) && (item.mass > dnaValues.minDejecMass)) {
+                    let dejec = normalizeNewItem({ x, y, mass: 1, alive: false, dna: '', parent: item.id }, size);
+                    movedItem.mass -= 1;
+                    addItemToMap(map, size, items, dejec);
+                    // console.log(`Item ${id} on (${movedItem.x},${movedItem.y}) [${movedItem.mass}] created excrement on (${x}, ${y}) with mass 1`);
                 }
-            } else {
-                item = null;
             }
-        } else {
-            // item has aged anyway
-            items = updateItems(items, [], [item]);
-            map[x + y * size] = item;
         }
 
         // Resolve death
-        if (item) {
+        if (item && item.alive && (!movedItem || movedItem.id === id)) {
             if (item.age >= maxAge || (item.age >= minAge && random(5) == 0)) {
-                let newItem = { ...item, alive: false };
-                items = updateItems(items, [item], [newItem]);
-                map[x + y * size] = newItem;
-                item = null;
+                // console.log(`Item ${id} [${item.mass}] died at age ${item.age} (maxAge: ${maxAge})`);
+                item.alive = false;
             }
         }
 
         // Resolve birth
-        if (item) {
-            if (mass >= dnaValues.minReproMass) {
+        if (item && item.alive) {
+            if (item.mass >= dnaValues.minReproMass) {
                 if (random(dnaValues.reproRateDen) < dnaValues.reproRate) {
                     let placed = false;
                     let positions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
-                    positions.forEach(position => {
+                    positions.forEach((position) => {
                         if (!placed) {
                             let newX = normalizeValueOnSize(x + position[0], size);
                             let newY = normalizeValueOnSize(y + position[1], size);
@@ -232,16 +251,14 @@ export const moveItem = (size, map, items, item) => {
                             let newIndex = newX + newY * size;
                             if (map[newIndex] === null) {
                                 let newBirthMass = Math.floor(item.mass / 3);
-                                if (newBirthMass<1) {
+                                if (newBirthMass < 1) {
                                     newBirthMass = 1;
                                 }
-                                let childItem = normalizeItem({ x: newX, y: newY, mass: newBirthMass, alive: true, dna: mutate(dnaValues, item.dna), parent: item.id }, size);
-                                let newItem = { ...item, mass: item.mass - newBirthMass };
-                                map[index] = newItem;
-                                map[newIndex] = childItem;
-                                items = updateItems(items, [item], [newItem, childItem]);
-                                item = newItem;
+                                let childItem = normalizeNewItem({ x: newX, y: newY, mass: newBirthMass, alive: true, dna: mutate(dnaValues, item.dna), parent: item.id }, size);
+                                item.mass -= newBirthMass
+                                addItemToMap(map, size, items, childItem);
                                 placed = true;
+                                // console.log(`Item ${id} [${item.mass}] gave birth to a new item ${childItem.id} at (${newX}, ${newY}) with mass ${newBirthMass}`);
                             }
                         }
                     })
@@ -249,48 +266,49 @@ export const moveItem = (size, map, items, item) => {
             }
         }
     }
-    return { map, items };
-};
+}
 
 export const moveItems = (size, map, items) => {
     // console.log('moveItems', {size, map, items});
-    items.forEach(itemX => {
-        let id = itemX.id;
-        let item = items.filter(it => it.id === id)[0];
-        if (item) {
-            let newProps = moveItem(size, map, items, item);
-            map = newProps.map;
-            items = newProps.items;
+    Object.keys(items).forEach((id) => {
+        const item = items[id];
+        if (item && item.alive) {
+            // console.log(`Processing item ${id}`);
+            moveItem(size, map, items, item);
         }
     });
-    let itemById = {};
-    items.forEach(item => {
-        if (item.type != 0 && item.alive) {
-            let newItem = normalizeItem({...item, dna: mutate(item.dnaValues, item.dna)}, size);
-            itemById[newItem.id] = newItem;
-        } else {
-            itemById[item.id] = item;
+
+
+    Object.values(items).forEach((item) => {
+        if (item.type != ORGANIC && item.alive) {
+            item.dna = mutate(item.dnaValues, item.dna)
+            normalizeItem(item, size);
         }
-    });
-    items = items.map(item=>itemById[item.id]);
-    map = map.map(item=>item ? itemById[item.id] : null);
-    return { map, items };
+    })
 };
 
 export const insertItem = (size, map, items, item) => {
-    // console.log('insertItem', {size, map, items, item});
-    item = normalizeItem(item, size);
+    // console.log('insertItem', { size, map, items, item });
+    item = normalizeNewItem(item, size);
     let { x, y } = item;
-    map = [...map];
-    let existingItem = map[x + y * size];
-    if (!existingItem) {
-        map[x + y * size] = item;
-        items = [...items, item];
+    let existingItemId = map[x + y * size];
+    if (!existingItemId) {
+        map[x + y * size] = item.id;
+        items[item.id] = item
     } else {
-        let newItem = resolveItems(item, existingItem);
-        map[x + y * size] = newItem;
-        items = updateItems(items, [item, existingItem], [newItem]);
+        let newItem = resolveItems(item, items[existingItemId]);
+        if (!newItem) {
+            console.warn('insertItem: Can\'t insert item', { item, existingItemId, map, items });
+        } else {
+            if (newItem.id !== existingItemId) {
+                delete items[existingItemId];
+            }
+            if (newItem.id === item.id) {
+                items[item.id] = item
+            }
+            if (map[x + y * size] !== newItem.id) {
+                map[x + y * size] = newItem.id;
+            }
+        }
     }
-
-    return { map, items };
 }

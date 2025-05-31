@@ -65,7 +65,7 @@ const ItemLine = createComponent(({ item, highlighted, onHighlight }) =>
 export default createComponent(() => {
     const dispatch = useDispatch()
 
-    const items = useItems()
+    const items = Object.values(useItems())
     const highlighted = useHighlighted()
     const onHighlight = (id) => dispatch(actions.evoMap.highlightItem({ id }))
 

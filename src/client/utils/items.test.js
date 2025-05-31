@@ -1,5 +1,5 @@
 import guid from './guid';
-import { normalizeItem, updateItems, initMap, resolveItems, insertItem, moveItems } from './items';
+import { normalizeNewItem, updateItems, initMap, resolveItems, insertItem, moveItems } from './items';
 import { generateDna, extractProps } from './itemprops';
 import { ORGANIC, HERBIVORE, CARNIVORE, OMNIVORE } from '@/utils/constants/itemType';
 
@@ -27,27 +27,27 @@ describe('guid', () => {
 describe('normalizeItem', () => {
     test('normalizeItem on emptyItem', () => {
         guidCountReinit();
-        let normalizedItem = normalizeItem({}, 16);
+        let normalizedItem = normalizeNewItem({}, 16);
         expect(normalizedItem).toEqual({ id: "00000000-0000-0000-0000-000000000001", x: 0, y: 0, alive: false, mass: 0, dna: '' });
     });
     test('normalizeItem on organic with mass', () => {
         guidCountReinit();
-        let normalizedItem = normalizeItem({ mass: 15 }, 16);
+        let normalizedItem = normalizeNewItem({ mass: 15 }, 16);
         expect(normalizedItem).toEqual({ id: "00000000-0000-0000-0000-000000000001", x: 0, y: 0, alive: false, mass: 15, dna: '' });
     });
     test('normalizeItem on herbivore with mass', () => {
         guidCountReinit();
-        let normalizedItem = normalizeItem({ mass: 15, dna: generateDna({ type: HERBIVORE }) }, 16);
+        let normalizedItem = normalizeNewItem({ mass: 15, dna: generateDna({ type: HERBIVORE }) }, 16);
         expect(normalizedItem).toEqual({ id: "00000000-0000-0000-0000-000000000001", x: 0, y: 0, alive: true, mass: 15, dna: '0000000000000000000000000000001' });
     });
     test('normalizeItem on carnivore with mass', () => {
         guidCountReinit();
-        let normalizedItem = normalizeItem({ mass: 15, dna: generateDna({ type: CARNIVORE }) }, 16);
+        let normalizedItem = normalizeNewItem({ mass: 15, dna: generateDna({ type: CARNIVORE }) }, 16);
         expect(normalizedItem).toEqual({ id: "00000000-0000-0000-0000-000000000001", x: 0, y: 0, alive: true, mass: 15, dna: '0000000000000000000000000000010' });
     });
     test('normalizeItem on omnivore with mass', () => {
         guidCountReinit();
-        let normalizedItem = normalizeItem({ mass: 15, dna: generateDna({ type: OMNIVORE }) }, 16);
+        let normalizedItem = normalizeNewItem({ mass: 15, dna: generateDna({ type: OMNIVORE }) }, 16);
         expect(normalizedItem).toEqual({ id: "00000000-0000-0000-0000-000000000001", x: 0, y: 0, alive: true, mass: 15, dna: '0000000000000000000000000000011' });
     });
 });

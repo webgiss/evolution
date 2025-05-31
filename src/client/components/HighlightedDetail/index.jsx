@@ -7,7 +7,7 @@ import { Divider, Grid, Segment } from 'semantic-ui-react';
 export default createComponent(() => {
 
     const highlighted = useHighlighted()
-    const item = useItems().filter(i => i.id === highlighted)[0] || null;
+    const item = useItems()[highlighted] || null;
 
     return (
         <div className='details'>

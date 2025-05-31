@@ -10,7 +10,7 @@ const identifyItem = (item) => [
 ];
 
 const getHistoryFrame = (items) => {
-    return items
+    return Object.values(items)
         .reduce(
             (acc, item) => {
                 const itemValues = identifyItem(item);
@@ -52,11 +52,9 @@ const slice = createSlice({
             if (history.length === 0) {
                 history.push(getHistoryFrame(items))
             }
-            let data = moveItems(size, map, items);
-            history.push(getHistoryFrame(data.items))
+            moveItems(size, map, items);
+            history.push(getHistoryFrame(items))
 
-            state.map = data.map;
-            state.items = data.items;
             state.generation += 1;
         },
         highlightItem(state, action) {
@@ -69,11 +67,17 @@ const slice = createSlice({
         },
         reset(state) {
             state.size = initialState.size
-            state.map = initialState.map
-            state.items = initialState.items
+            state.map.splice(0, state.map.length, ...initialState.map);
+            const keys = Object.keys(state.items)
+            keys.forEach(key => {
+                delete state.items[key];
+            });
+            Object.keys(initialState.items).forEach(key => {
+                state.items[key] = initialState.items[key]
+            })
             state.generation = initialState.generation
             state.highlighted = initialState.highlighted
-            state.history = initialState.history
+            state.history.splice(0, state.history.length, ...initialState.history)
             const initSet = [
                 { x: 1, y: 1, mass: 30, alive: false },
                 { x: 1, y: 2, mass: 30, alive: false },
@@ -85,16 +89,12 @@ const slice = createSlice({
                 { x: 2, y: 2, mass: 50, alive: true, type: HERBIVORE }
             ];
             initSet.forEach(item => {
-                let { map, items } = insertItem(state.size, state.map, state.items, item);
-                state.map = map;
-                state.items = items;
+                insertItem(state.size, state.map, state.items, item);
             });
         },
         addLivingBioMass(state) {
             const item = { x: 0, y: 0, mass: 70, alive: true, type: HERBIVORE, dna: '' };
-            let { map, items } = insertItem(state.size, state.map, state.items, item);
-            state.map = map;
-            state.items = items;
+            insertItem(state.size, state.map, state.items, item);
         },
         swapWalls(state) {
             const items = [];
@@ -104,9 +104,7 @@ const slice = createSlice({
             range(20).forEach((y) => items.push({ x: 16, y: y + 12, type: ROCK }));
             range(20).forEach((y) => items.push({ x: 17, y: y + 12, type: ROCK }));
             items.forEach(item => {
-                let { map, items: newItems } = insertItem(state.size, state.map, state.items, item);
-                state.map = map;
-                state.items = newItems;
+                insertItem(state.size, state.map, state.items, item);
             });
         },
 

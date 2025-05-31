@@ -8,10 +8,10 @@ import MiniMap from '../MiniMap';
 export default createComponent(({ extractValue, getConst, description }) => {
     const dispatch = useDispatch()
     const items = useItems()
-    const map = useMap() || []
+    const map = (useMap() || []).map((id) => items[id] || null)
     const size = useSize()
     const highlighted = useHighlighted()
-    const constValue = getConst(items)
+    const constValue = getConst(Object.values(items))
 
     const onHighlight = (id) => dispatch(actions.evoMap.highlightItem({ id }))
 

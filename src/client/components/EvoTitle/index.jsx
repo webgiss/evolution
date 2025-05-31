@@ -11,7 +11,7 @@ const countMapper = item => 1;
 
 export default createComponent(() => {
     const generation = useGeneration()
-    const items = useItems()
+    const items = Object.values(useItems())
     const totalBioMass = items.map(massMapper).reduce(sumReducer, 0)
     const organicBioMass = items.filter(item => (!item.alive) || item.type === ORGANIC).map(massMapper).reduce(sumReducer, 0)
     const herbivoreBioMass = items.filter(item => item.alive && item.type === HERBIVORE).map(massMapper).reduce(sumReducer, 0)

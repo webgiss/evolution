@@ -4,7 +4,7 @@ import { useItems } from '@/redux/selectors/evoMap';
 import MiniBar from '../MiniBar';
 
 export default createComponent(({ extractValues, description, step }) => {
-    const values = extractValues(useItems())
+    const values = extractValues(Object.values(useItems()))
 
     return (
         <MiniBar
